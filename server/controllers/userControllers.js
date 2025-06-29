@@ -1,11 +1,10 @@
 import bcrypt from "bcryptjs";
-import { generateToken } from "../lib/utils";
+import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import cloudinary from "../lib/cloudinary.js";
 
 export const singup = async(req,res)=>{
     const {fullName, email, password, bio} = req.body;
-
 
     try{
 
@@ -25,7 +24,7 @@ export const singup = async(req,res)=>{
         const hashedPassword = await bcrypt.hash(password,salt);
 
 
-        const newUser = await.User.create({
+        const newUser = await User.create({
             fullName, email, password:hashedPassword, bio
         });
 
@@ -117,5 +116,4 @@ export const updateProfile = async (req,res)=>{
         
 
     }
-}
 }

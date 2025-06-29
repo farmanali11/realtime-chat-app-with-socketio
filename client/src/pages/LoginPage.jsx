@@ -9,15 +9,16 @@ const LoginPage = () => {
   const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
 
-
-  const onSubmitHandler=(event)=>{
+  const onSubmitHandler = (event) => {
     event.preventDefault();
-    if(currState === 'Sign up' && !isDataSubmitted){
-      setIsDataSubmitted(true)
+    if (currState === "Sign up" && !isDataSubmitted) {
+      setIsDataSubmitted(true);
       return;
     }
 
-  }
+    // Here you would typically send data to server
+    console.log({ fullName, email, password, bio });
+  };
 
   return (
     <div className="min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-2xl">
@@ -25,24 +26,22 @@ const LoginPage = () => {
       <img src={assets.logo_big} alt="Logo" className="w-[min(30vw,250px)]" />
 
       {/* Right Form */}
-      <form onSubmit ={onSubmitHandler}
+      <form
+        onSubmit={onSubmitHandler}
         className="border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col gap-6 rounded-lg shadow-lg"
-        onSubmit={(e) => {
-          e.preventDefault();
-          setIsDataSubmitted(true);
-        }}
       >
         <h2 className="font-medium text-2xl flex justify-between items-center">
           {currState}
-
-          {isDataSubmitted && <img onClick ={()=>{isDataSubmitted("false")}}
-            src={assets.arrow_icon}
-            className="w-5 cursor-pointer"
-            onClick={() =>
-              setCurrState(currState === "Sign up" ? "Login" : "Sign up")
-            }
-          /> }
-          
+          {isDataSubmitted && (
+            <img
+              src={assets.arrow_icon}
+              className="w-5 cursor-pointer"
+              onClick={() => {
+                setCurrState(currState === "Sign up" ? "Login" : "Sign up");
+                setIsDataSubmitted(false);
+              }}
+            />
+          )}
         </h2>
 
         {/* Full Name */}
@@ -92,6 +91,14 @@ const LoginPage = () => {
           ></textarea>
         )}
 
+        {/* Terms */}
+        {!isDataSubmitted && (
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <input type="checkbox" required />
+            <p>Agree to the terms of use & privacy policy</p>
+          </div>
+        )}
+
         {/* Submit Button */}
         <button
           type="submit"
@@ -100,20 +107,30 @@ const LoginPage = () => {
           {currState === "Sign up" ? "Create Account" : "Login Now"}
         </button>
 
-        {/* Terms */}
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <input type="checkbox" required />
-          <p>Agree to the terms of use & privacy policy</p>
-        </div>
-
-        <div className='flex flex-col gap-2'>
+        {/* Toggle Prompt */}
+        <div className="flex flex-col gap-2">
           {currState === "Sign up" ? (
-            <p className='text-sm text-gray-600'>
-              Already have an account? <span onClick={()=>{setCurrState("Login"); setIsDataSubmitted(false)}} className='font-medium text-violet-500 cursor-pointer'>Login Here</span>
+            <p className="text-sm text-gray-600">
+              Already have an account?{" "}
+              <span
+                onClick={() => {
+                  setCurrState("Login");
+                  setIsDataSubmitted(false);
+                }}
+                className="font-medium text-violet-500 cursor-pointer"
+              >
+                Login Here
+              </span>
             </p>
           ) : (
-            <p className='text-sm text-gray-600'>
-              Create an account <span onClick={()=>setCurrState("Sign up")} className='font-medium text-violet-500 cursor-pointer'>Click Here</span>
+            <p className="text-sm text-gray-600">
+              Create an account{" "}
+              <span
+                onClick={() => setCurrState("Sign up")}
+                className="font-medium text-violet-500 cursor-pointer"
+              >
+                Click Here
+              </span>
             </p>
           )}
         </div>

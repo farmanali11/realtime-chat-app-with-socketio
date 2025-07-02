@@ -1,15 +1,17 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-// Function to connect the mongodb database
+// Function to connect to MongoDB database
+export const connectDB = async () => {
+  try {
+    mongoose.connection.on('connected', () => console.log('Database Connected'));
 
-export const connectDB= async () =>{
-    try {
+    await mongoose.connect(`${process.env.MONGODB_URI}/chat-app`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
-        mongoose.connection.on('conneted',()=>console.log('Database Connected'))
-        await mongoose.connect(`${process.env.MONGODB_URI}/chat-app`)
-
-    }catch (error){
-        console.log(error)
-
-    }
-}
+  } catch (error) {
+    console.log("MongoDB connection error:", error.message);
+    process.exit(1);
+  }
+};

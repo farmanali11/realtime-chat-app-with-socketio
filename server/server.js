@@ -5,59 +5,59 @@ import http from "http";
 import { connectDB } from "./lib/db.js";
 import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoute.js";
-import {Server} from "socket.io"
+import { Server } from "socket.io";
 
-// Create express app using http server
-
+// Initialize Express app
 const app = express();
+
+// Create HTTP server from Express app
 const server = http.createServer(app);
 
-// Initialize WebSocket.io server
+// Initialize WebSocket server using Socket.io with CORS enabled for all origins
+export const io = new Server(server, {
+    cors: { origin: "*" },
+});
 
+// Store online users: key = userId, value = socket.id
+export const userSocketMap = {};
 
-export const io = new Server(server,{
-    cors:{origin:"*"}
-})
-
-// Store Online users
-
-export const userSocketMap = { };
-
-
-//Socket io connection handler
-
-
-io.on("connection",(socket)=>{
+// Handle WebSocket connections
+io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
-    console.log("User Connected",userId);
+    console.log("User Connected:", userId);
 
-    if(userId) userSocketMap[userId]=socket.id;
+    // Save the user and their socket ID
+    if (userId) userSocketMap[userId] = socket.id;
 
+    // Broadcast the updated list of online users
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-    //Emit online users to all connected clients
+    // Handle disconnection
+    socket.on("disconnect", () => {
+        console.log("User Disconnected:", userId);
 
-    io.emit("getOnlineUsers", Object.keys(userSocketMap))
+        // Remove user from the online map
+        if (userId) {
+            delete userSocketMap[userId];
+            io.emit("getOnlineUsers", Object.keys(userSocketMap));
+        }
+    });
+});
 
-    socket.on("disconnected",()=>{
-        console.log("User Disconnected",userId);
-
-        delete userSocketMap[userId];
-        io.emit("getOnlineUsers", Object.keys(userSocketMap))
-    })
-})
-
-// Middleware Setup
-
+// Middleware to parse incoming JSON requests
 app.use(express.json({ limit: "4mb" }));
+
+// Enable CORS for all routes
 app.use(cors());
 
-//Rouites Setup
+// API Routes
+app.use("/api/status", (req, res) => res.send("Server is Live")); // Health check route
+app.use("/api/auth", userRouter); // User-related routes
+app.use("/api/messages", messageRouter); // Messaging routes
 
-app.use("/api/status", (req, res) => res.send("Server is Live"));
-app.use("/api/auth", userRouter);
-app.use("/api/messages",messageRouter)
-
+// Connect to MongoDB
 connectDB();
 
+// Start the server
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log("Server is running on the PORT:" + PORT));
+server.listen(PORT, () => console.log("Server is running on the PORT: " + PORT));

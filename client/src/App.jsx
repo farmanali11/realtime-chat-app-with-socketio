@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 
 import HomePage from "./pages/HomePage";
@@ -16,27 +16,25 @@ const App = () => {
       {/* Global toast notification system */}
       <Toaster position="top-center" reverseOrder={false} />
 
-      <BrowserRouter>
-        <Routes>
-          {/* Home route - protected */}
-          <Route
-            path="/"
-            element={authUser ? <HomePage /> : <Navigate to="/login" />}
-          />
+      <Routes>
+        {/* Home route - protected */}
+        <Route
+          path="/"
+          element={authUser ? <HomePage /> : <Navigate to="/login" />}
+        />
 
-          {/* Login route - accessible only if not logged in */}
-          <Route
-            path="/login"
-            element={!authUser ? <LoginPage /> : <Navigate to="/" />}
-          />
+        {/* Login route - accessible only if not logged in */}
+        <Route
+          path="/login"
+          element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+        />
 
-          {/* Profile route - protected */}
-          <Route
-            path="/profile"
-            element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
-          />
-        </Routes>
-      </BrowserRouter>
+        {/* Profile route - protected */}
+        <Route
+          path="/profile"
+          element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
+        />
+      </Routes>
     </div>
   );
 };
